@@ -1,0 +1,15 @@
+# Global excludes
+*.DS_Store
+*.task
+.pytest_cache
+.vscode/
+.idea/
+_*
+__pycache__
+IN_CLASS_DEMOS/*
+logs/
+tasks/
+data_files/
+
+# Global include excluded
+!IN_CLASS_DEMOS/README.md
