@@ -2,7 +2,7 @@
 Course: CSE 351
 Lesson: L01 Team Activity
 File:   team.py
-Author: 
+Author: Emma Davis
 Purpose: Find prime numbers
 
 Instructions:
@@ -44,28 +44,10 @@ def is_prime(n):
         i += 6
     return True
 
-class PrimeThread(threading.Thread):
-    def __init__(self, start, range_count, lock):
-        super().__init__()
-        self.num_primes = 0
-        self._start = start
-        self._range_count = range_count
-        self._lock = lock
-    
-    def run(self):
-        global prime_count, numbers_processed
-        for i in range(self._start, self._start + self._range_count):
-            numbers_processed += 1
-            if is_prime(i):
-                # prime_count += 1
-                self._lock.acquire()
-                prime_count = prime_count + 1
-                self.num_primes += 1
-                print(i, end=', ', flush=True)
-        print(flush=True)
+def count_primes(start, range_count):
+    global prime_count
+    global numbers_processed
 
-def my_function(start, range_count):
-    global prime_count, numbers_processed
     for i in range(start, start + range_count):
         numbers_processed += 1
         if is_prime(i):
@@ -82,22 +64,10 @@ def main():
 
     start = 10000000000
     range_count = 100000
-    numbers_processed = 0
-    lock = threading.Lock()
-    # my_function(start, range_count)
-    threads = []
 
-    for current_start in range(start, start + range_count, range_count // 10):
-        t = PrimeThread(current_start, range_count // 10, lock)
-        t.start()
-        threads.append(t)
-
-    num = 0
-    for t in threads:    
-        t.join()
-        num += 1
-        print(f"thread {num} produced {t.num_primes}")
-
+    t = threading.Thread(target=count_primes, args=(start, range_count))
+    t.start()
+    t.join()
 
     # Should find 4306 primes
     log.write(f'Numbers processed = {numbers_processed}')
