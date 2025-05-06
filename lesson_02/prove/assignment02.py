@@ -1,7 +1,11 @@
 """
 Course    : CSE 351
 Assignment: 02
-Student   : <your name here>
+Student   : Emma Davis
+
+4: Meets Requirments
+    My program has the threads and classes all programed and working. The balances in the accounts are all correct and identical to the
+    numbers in the test_balances function.
 
 Instructions:
     - review instructions in the course
@@ -32,16 +36,15 @@ def main():
     bank = Bank()
 
     # TODO - Add a ATM_Reader for each data file
-
     threads = []
 
-    for file_path in data_files:
-         reader = ATM_Reader(bank, file_path)
-         threads.append(reader)
-         reader.start()
+    for data_file in data_files:
+        reader = ATM_Reader(data_file, bank)
+        threads.append(reader)
+        reader.start()
 
     for thread in threads:
-         thread.join()
+        thread.join()
 
     test_balances(bank)
 
@@ -50,76 +53,83 @@ def main():
 
 # ===========================================================================
 class ATM_Reader(threading.Thread):
-    def __init__(self, bank, file_path):
+    def __init__(self, filename, bank):
         super().__init__()
-        self.bank = bank
-        self.file_path = file_path
+        self._filename = filename
+        self._bank = bank
 
     def run(self):
-        with open(self.file_path, "r") as file:
+        with open(self._filename, 'r') as file:
             for line in file:
-                if line.strip().startswith('#') or not line.strip():
-                        continue
-                
-                parts = line.strip().split(',')
-                if len(parts) != 3:
-                        continue
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
 
-                account_number, transaction_type, amount = parts
-                money = Money(amount)
+                try:
+                    account_number, trans_type, amount = line.split(',')
+                    account_number = int(account_number)
+                    amount = Money(amount)
 
-                if transaction_type.lower() == 'd':
-                        self.bank.deposit(account_number, money)
-                elif transaction_type.lower() == 'w':
-                        self.bank.withdraw(account_number, money)
+                    if trans_type == 'd':
+                        self._bank.deposit(account_number, amount)
+                    
+                    elif trans_type == 'w':
+                        self._bank.withdraw(account_number, amount)
+
+                except (ValueError, TypeError) as e:
+                    # Skip malformed lines (optional error handling)
+                    continue
+
+    
     ...
 
 
 # ===========================================================================
-class Account():
-    def __init__(self, account_number, lock):
-         self.account_number = account_number
-         self.balance = Money("0.00")
-         self.lock = lock
-    
+class Account:
+    def __init__(self, account_number):
+        self._account_number = account_number
+        self._balance = Money('0.00')
+        self._lock = threading.Lock()
+
     def deposit(self, amount):
-         with self.lock:
-            self.balance.add(amount)
-    
+        with self._lock:
+            self._balance.add(amount)
+
     def withdraw(self, amount):
-         with self.lock:
-            self.balance.sub(amount)
-    
+        with self._lock:
+            self._balance.sub(amount)
+
     def get_balance(self):
-         with self.lock:
-            return self.balance
+        with self._lock:
+            return self._balance
+
     ...
 
 
 # ===========================================================================
 class Bank():
     def __init__(self):
-         self.accounts = {}
-         self.lock = threading.Lock()
+        self._accounts = {}
+        self._lock = threading.Lock()
 
-    def get_account(self, account_number):
-         with self.lock:
-            if account_number not in self.accounts:
-                self.accounts[account_number] = Account(account_number, threading.Lock())
-            return self.accounts[account_number]
-         
     def deposit(self, account_number, amount):
-         account = self.get_account(account_number)
-         account.deposit(amount)
+        account = self._get_or_create_account(account_number)
+        account.deposit(amount)
 
     def withdraw(self, account_number, amount):
-         account = self.get_account(account_number)
-         account.withdraw(amount)
+        account = self._get_or_create_account(account_number)
+        account.withdraw(amount)
 
     def get_balance(self, account_number):
-         account = self.get_account(account_number)
-         return account.get_balance()
-                
+        account = self._get_or_create_account(account_number)
+        return account.get_balance()
+
+    def _get_or_create_account(self, account_number):
+        with self._lock:
+            if account_number not in self._accounts:
+                self._accounts[account_number] = Account(account_number)
+            return self._accounts[account_number]
+    
                 
     ...
 
