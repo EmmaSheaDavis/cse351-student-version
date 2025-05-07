@@ -1,7 +1,7 @@
 """
 Course: CSE 351 
-Lesson: L02 team activity
-File:   team.py
+Lesson: L03 team activity
+File:   W03team-solution.py
 Author: <Add name here>
 
 Purpose: Retrieve Star Wars details from a server
@@ -24,8 +24,6 @@ TODO
   called get_name() that returns the name of the character, planet, etc...
 - The threaded class should only retrieve one URL.
 
-
-  
 - Speed up this program as fast as you can by:
     - creating as many as you can
     - start them all
@@ -35,6 +33,7 @@ TODO
 
 from datetime import datetime, timedelta
 import threading
+import queue
 
 from common import *
 
@@ -42,36 +41,35 @@ from common import *
 from cse351 import *
 
 # global
+THREADS = 10
 call_count = 0
 
-class DataRetriever(threading.Thread):
-    def __init__(self, url):
-        super().__init__()
-        self._url = url
-        self._name = None
+class GetUrl(threading.Thread):
 
-    def run(self):
-        global call_count
-        with threading.Lock():
-            call_count += 1
-        item = get_data_from_server(self._url)
-        self._name = item["name"]
+    def __init__(self, url):
+        threading.Thread.__init__(self)
+        self.url = url
+        self.name = ''
 
     def get_name(self):
-        return self._name
+        return self.name
 
-def get_urls(film6, kind):
-    threads = []
-    urls = film6[kind]
-    print(kind)
+    def run(self):
+        item = get_data_from_server(self.url)
+        self.name = item['name']
 
-    for url in urls:
-        thread = DataRetriever(url)
-        threads.append(thread)
-        thread.start()
 
-    for thread in threads:
-        thread.join()
+def get_url(que):
+    global call_count
+
+    while True:
+        call_count += 1
+        url = que.get()
+        if url is None:
+            break
+
+        data = get_data_from_server(url)
+        print(f'  - {data['name']}')
 
 
 def main():
@@ -80,18 +78,46 @@ def main():
     log = Log(show_terminal=True)
     log.start_timer('Starting to retrieve data from the server')
 
-    
-
     film6 = get_data_from_server(f'{TOP_API_URL}/films/6')
     call_count += 1
     print_dict(film6)
 
-    # Retrieve people
-    get_urls(film6, 'characters')
-    get_urls(film6, 'planets')
-    get_urls(film6, 'starships')
-    get_urls(film6, 'vehicles')
-    get_urls(film6, 'species')
+    # Create shared queue
+    que = queue.Queue()
+
+    # Create threads
+    threads = []
+    for i in range(THREADS):
+        t = threading.Thread(target=get_url, args=(que,))
+        threads.append(t)
+
+    # Start threads
+    for t in threads:
+        t.start()
+
+    # fill queue with urls
+
+    for url in film6['characters']:
+        que.put(url)
+    
+    for url in film6['planets']:
+        que.put(url)
+    
+    for url in film6['starships']:
+        que.put(url)
+    
+    for url in film6['vehicles']:
+        que.put(url)
+    
+    for url in film6['species']:
+        que.put(url)
+
+    for i in range(THREADS):
+        que.put(None)
+    
+    # Join threads
+    for t in threads:
+        t.join()
 
     log.stop_timer('Total Time To complete')
     log.write(f'There were {call_count} calls to the server')
