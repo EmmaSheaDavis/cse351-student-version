@@ -23,6 +23,8 @@ TODO
   it retrieves data based on a URL.  The class should have a method
   called get_name() that returns the name of the character, planet, etc...
 - The threaded class should only retrieve one URL.
+
+
   
 - Speed up this program as fast as you can by:
     - creating as many as you can
@@ -42,21 +44,43 @@ from cse351 import *
 # global
 call_count = 0
 
-def get_urls(film6, kind):
-    global call_count
+class DataRetriever(threading.Thread):
+    def __init__(self, url):
+        super().__init__()
+        self._url = url
+        self._name = None
 
+    def run(self):
+        global call_count
+        with threading.Lock():
+            call_count += 1
+        item = get_data_from_server(self._url)
+        self._name = item["name"]
+
+    def get_name(self):
+        return self._name
+
+def get_urls(film6, kind):
+    threads = []
     urls = film6[kind]
     print(kind)
+
     for url in urls:
-        call_count += 1
-        item = get_data_from_server(url)
-        print(f'  - {item['name']}')
+        thread = DataRetriever(url)
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
 
 def main():
     global call_count
 
     log = Log(show_terminal=True)
     log.start_timer('Starting to retrieve data from the server')
+
+    
 
     film6 = get_data_from_server(f'{TOP_API_URL}/films/6')
     call_count += 1
