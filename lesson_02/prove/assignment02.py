@@ -85,7 +85,7 @@ class ATM_Reader(threading.Thread):
 
 
 # ===========================================================================
-class Account:
+class Account():
     def __init__(self, account_number):
         self._account_number = account_number
         self._balance = Money('0.00')
