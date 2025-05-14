@@ -20,7 +20,7 @@ recno: record number starting from 0
 import time
 import threading
 from queue import Queue, Empty
-from common import  TOP_API_URL, CITIES, get_data_from_server
+from common import *
 from cse351 import *
 
 THREADS = 50
