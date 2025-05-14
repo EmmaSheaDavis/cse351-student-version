@@ -34,23 +34,42 @@ TODO
 
 from datetime import datetime, timedelta
 import threading
+import queue
 from common import *
 
 # Include cse 351 common Python files
 from cse351 import *
 
 # global
+THREADS = 10
 call_count = 0
 
-def get_urls(film6, kind):
+url_queue = queue.Queue()
+
+class GetUrl(threading.Thread):
+    def __init__(self, url):
+        super.__init__(self)
+        self._url = url
+        self.name = ""
+    
+    def get_name(self):
+        return self.name
+    
+    def run(self):
+        item = get_data_from_server(self._url)
+        self.name = item["name"]
+
+def get_urls(que):
     global call_count
 
-    urls = film6[kind]
-    print(kind)
-    for url in urls:
+    while True:
         call_count += 1
-        item = get_data_from_server(url)
-        print(f'  - {item['name']}')
+        url = que.get()
+        if url is None:
+            break
+
+        data = get_data_from_server(url)
+        print(f" - {data["name"]}")
 
 def main():
     global call_count
@@ -62,12 +81,36 @@ def main():
     call_count += 1
     print_dict(film6)
 
-    # Retrieve people
-    get_urls(film6, 'characters')
-    get_urls(film6, 'planets')
-    get_urls(film6, 'starships')
-    get_urls(film6, 'vehicles')
-    get_urls(film6, 'species')
+    que = queue.Queue()
+
+    threads = []
+    for i in range(THREADS):
+        t = threading.Thread(target=get_urls, args=(que,))
+        threads.append(t)
+
+    for t in threads:
+        t.start()
+
+    for url in film6['characters']:
+        que.put(url)
+    
+    for url in film6['planets']:
+        que.put(url)
+    
+    for url in film6['starships']:
+        que.put(url)
+    
+    for url in film6['vehicles']:
+        que.put(url)
+    
+    for url in film6['species']:
+        que.put(url)
+
+    for i in range(THREADS):
+        que.put(None)
+
+    for t in threads:
+        t.join()
 
     log.stop_timer('Total Time To complete')
     log.write(f'There were {call_count} calls to the server')
