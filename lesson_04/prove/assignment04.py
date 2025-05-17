@@ -19,18 +19,12 @@ recno: record number starting from 0
 import time
 import threading
 from queue import Queue, Empty
-<<<<<<< HEAD
 
-=======
->>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
 from common import *
 from cse351 import *
 
-<<<<<<< HEAD
 THREADS = 50                 # TODO - set for your program
-=======
 THREADS = 50
->>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
 WORKERS = 10
 RECORDS_TO_RETRIEVE = 100
 
@@ -60,7 +54,6 @@ def retrieve_weather_data(command_queue, worker_queue):
         except Exception as e:
             print(f"Error in retrieve_weather_data: {e}")
 
-<<<<<<< HEAD
 # ---------------------------------------------------------------------------
 def retrieve_weather_data(command_queue, worker_queue):
     # TODO - fill out this thread function (and arguments)
@@ -79,14 +72,12 @@ def retrieve_weather_data(command_queue, worker_queue):
             command_queue.task_done()
         except Empty:
             continue
-=======
 class Worker(threading.Thread):
     def __init__(self, worker_queue, noaa):
         super().__init__()
         self.worker_queue = worker_queue
         self.noaa = noaa
         self.daemon = True
->>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
 
     def run(self):
         while True:
@@ -101,7 +92,6 @@ class Worker(threading.Thread):
             except Empty:
                 continue
 
-<<<<<<< HEAD
 # ---------------------------------------------------------------------------
 # TODO - Create Worker threaded class
 class Worker(threading.Thread):
@@ -128,21 +118,15 @@ class Worker(threading.Thread):
 
 # ---------------------------------------------------------------------------
 # TODO - Complete this class
-=======
->>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
 class NOAA:
     def __init__(self):
         super().__init__()
-<<<<<<< HEAD
         self._weather_data = {city: [] for city in CITIES}
-=======
         self.weather_data = {city: [] for city in CITIES}
->>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
         self.lock = threading.Lock()
 
     def add_weather_record(self, city, date, temp):
         with self.lock:
-<<<<<<< HEAD
             self._weather_data[city].append((date, temp))
 
     def get_temp_details(self, city):
@@ -151,7 +135,6 @@ class NOAA:
             if not records:
                 return 0.0
             total_temp = sum(temp for date , temp in records)
-=======
             self.weather_data[city].append((date, temp))
 
     def get_temp_details(self, city):
@@ -160,7 +143,6 @@ class NOAA:
             if not records:
                 return 0.0
             total_temp = sum(temp for date, temp in records)
->>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
             return total_temp / len(records) if records else 0.0
 
 def verify_noaa_results(noaa):
@@ -221,7 +203,7 @@ def main():
         command_queue = Queue()
         worker_queue = Queue()
 
-<<<<<<< HEAD
+
         print("Starting retriever threads")
         retriever_threads = []
         for _ in range(THREADS):
@@ -239,18 +221,18 @@ def main():
             w = Worker(worker_queue, noaa)
             w.start()
             worker_threads.append(w)
-=======
-<<<<<<< HEAD
+    except Exception as e:
+        print(f"Error in main: {e}")
+        raise
+
     # TODO - Create any queues, pipes, locks, barriers you need
-=======
->>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
+
     command_queue = Queue(maxsize=10)
     worker_queue = Queue(maxsize=10)
 
     for city in CITIES:
         for recno in range(records):
             command_queue.put((city, recno))
-<<<<<<< HEAD
 
     retriever_threads = []
     for _ in range(THREADS):
@@ -276,9 +258,6 @@ def main():
 
     for w in worker_threads:
         w.join()
-=======
->>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
->>>>>>> 00c981047243e877d4fbb3ffb34eccaae0cd273e
 
         print("Queueing commands")
         for city in CITIES:
@@ -309,9 +288,7 @@ def main():
         verify_noaa_results(noaa)
 
         log.stop_timer('Run time: ')
-    except Exception as e:
-        print(f"Error in main: {e}")
-        raise
+    
 
 if __name__ == '__main__':
     main()
