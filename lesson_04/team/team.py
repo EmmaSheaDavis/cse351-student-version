@@ -56,10 +56,11 @@ class Queue351():
         return len(self.__items) + extra
 
 # ---------------------------------------------------------------------------
-def producer():
+def producer(queue, items_sem, spaces_sem, producer_id, all_done_event):
     for i in range(PRIME_COUNT):
         number = random.randint(1, 1_000_000_000_000)
         # TODO - place on queue for workers
+        spaces_sem.aquire()
 
     # TODO - select one producer to send the "All Done" message
 
