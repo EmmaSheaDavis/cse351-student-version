@@ -1,7 +1,7 @@
 """
 Course    : CSE 351
 Assignment: 04
-Student   : <your name here>
+Student   : Emma Davis
 
 Instructions:
     - review instructions in the course
@@ -19,10 +19,18 @@ recno: record number starting from 0
 import time
 import threading
 from queue import Queue, Empty
+<<<<<<< HEAD
+
+=======
+>>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
 from common import *
 from cse351 import *
 
+<<<<<<< HEAD
+THREADS = 50                 # TODO - set for your program
+=======
 THREADS = 50
+>>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
 WORKERS = 10
 RECORDS_TO_RETRIEVE = 100
 
@@ -52,12 +60,33 @@ def retrieve_weather_data(command_queue, worker_queue):
         except Exception as e:
             print(f"Error in retrieve_weather_data: {e}")
 
+<<<<<<< HEAD
+# ---------------------------------------------------------------------------
+def retrieve_weather_data(command_queue, worker_queue):
+    # TODO - fill out this thread function (and arguments)
+    while True:
+        try:
+            command = command_queue.get(timeout = 1)
+            if command == "done":
+                command_queue.task_done()
+                break
+            city, recno = command
+
+            url = f'{TOP_API_URL}/record/{city}/{recno}'
+            data = get_data_from_server(url)
+            if data and "date" in data and "temp" in data:
+                worker_queue.put((city, data["date"], data["temp"]))
+            command_queue.task_done()
+        except Empty:
+            continue
+=======
 class Worker(threading.Thread):
     def __init__(self, worker_queue, noaa):
         super().__init__()
         self.worker_queue = worker_queue
         self.noaa = noaa
         self.daemon = True
+>>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
 
     def run(self):
         while True:
@@ -72,14 +101,57 @@ class Worker(threading.Thread):
             except Empty:
                 continue
 
+<<<<<<< HEAD
+# ---------------------------------------------------------------------------
+# TODO - Create Worker threaded class
+class Worker(threading.Thread):
+    def __init__(self, worker_queue, noaa):
+        super().__init__()
+        self._worker_queue = worker_queue
+        self._noaa = noaa
+
+    def run(self):
+        while True:
+            try:
+                item = self._worker_queue.get(timeout = 1)
+                if item == "done":
+                    self._worker_queue.task_done()
+                    break
+                city, date, temp = item
+                self._noaa.add_weather_record(city, date, temp)
+                self._worker_queue.task_done()
+            except Empty:
+                continue
+        
+
+
+
+# ---------------------------------------------------------------------------
+# TODO - Complete this class
+=======
+>>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
 class NOAA:
     def __init__(self):
         super().__init__()
+<<<<<<< HEAD
+        self._weather_data = {city: [] for city in CITIES}
+=======
         self.weather_data = {city: [] for city in CITIES}
+>>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
         self.lock = threading.Lock()
 
     def add_weather_record(self, city, date, temp):
         with self.lock:
+<<<<<<< HEAD
+            self._weather_data[city].append((date, temp))
+
+    def get_temp_details(self, city):
+        with self.lock:
+            records = self._weather_data[city]
+            if not records:
+                return 0.0
+            total_temp = sum(temp for date , temp in records)
+=======
             self.weather_data[city].append((date, temp))
 
     def get_temp_details(self, city):
@@ -88,6 +160,7 @@ class NOAA:
             if not records:
                 return 0.0
             total_temp = sum(temp for date, temp in records)
+>>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
             return total_temp / len(records) if records else 0.0
 
 def verify_noaa_results(noaa):
@@ -148,6 +221,7 @@ def main():
         command_queue = Queue()
         worker_queue = Queue()
 
+<<<<<<< HEAD
         print("Starting retriever threads")
         retriever_threads = []
         for _ in range(THREADS):
@@ -165,6 +239,46 @@ def main():
             w = Worker(worker_queue, noaa)
             w.start()
             worker_threads.append(w)
+=======
+<<<<<<< HEAD
+    # TODO - Create any queues, pipes, locks, barriers you need
+=======
+>>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
+    command_queue = Queue(maxsize=10)
+    worker_queue = Queue(maxsize=10)
+
+    for city in CITIES:
+        for recno in range(records):
+            command_queue.put((city, recno))
+<<<<<<< HEAD
+
+    retriever_threads = []
+    for _ in range(THREADS):
+        t = threading.Thread(target=retrieve_weather_data, args=(command_queue, worker_queue))
+
+        t.daemon = True
+        t.start()
+        retriever_threads.append(t)
+
+    worker_threads = []
+    for _ in range(WORKERS):
+        w = Worker(worker_queue, noaa)
+        w.start()
+        worker_threads.append(w)
+
+    command_queue.join()
+
+    for _ in range(THREADS):
+        command_queue.put("done")
+    
+    for t in retriever_threads:
+        t.join()
+
+    for w in worker_threads:
+        w.join()
+=======
+>>>>>>> 67bc1643d38300cd3ec606606082407f78e1a555
+>>>>>>> 00c981047243e877d4fbb3ffb34eccaae0cd273e
 
         print("Queueing commands")
         for city in CITIES:
