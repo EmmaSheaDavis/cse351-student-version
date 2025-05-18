@@ -57,6 +57,13 @@ class Queue351():
         return len(self.__items) + extra
 
 # ---------------------------------------------------------------------------
+<<<<<<< HEAD
+def producer(queue, items_sem, spaces_sem, producer_id, all_done_event):
+    for i in range(PRIME_COUNT):
+        number = random.randint(1, 1_000_000_000_000)
+        # TODO - place on queue for workers
+        spaces_sem.aquire()
+=======
 def producer(queue, items_sem, spaces_sem, producer_id, barrier):
     for i in range(PRIME_COUNT):
         number = random.randint(1, 1_000_000_000_000)
@@ -66,6 +73,7 @@ def producer(queue, items_sem, spaces_sem, producer_id, barrier):
         items_sem.release()
 
     barrier.wait()
+>>>>>>> 00c981047243e877d4fbb3ffb34eccaae0cd273e
 
     # TODO - select one producer to send the "All Done" message
     if producer_id == 0:
@@ -133,7 +141,7 @@ def main():
             primes = len(f.readlines())
     else:
         primes = 0
-    print(f"Found {primes} primes.  Should be {108}.")
+    print(f"Found {primes} primes. Must be 108 found.")
 
 
 

@@ -14,7 +14,6 @@ where:
 
 name: name of the city
 recno: record number starting from 0
-
 """
 
 import time
@@ -25,24 +24,38 @@ from common import *
 from cse351 import *
 
 THREADS = 50                 # TODO - set for your program
+<<<<<<< HEAD
+=======
+THREADS = 50
+>>>>>>> d461613e7aea7e13b699af406cc0f8ababdc33f1
 WORKERS = 10
-RECORDS_TO_RETRIEVE = 5000
+RECORDS_TO_RETRIEVE = 100
 
 def retrieve_weather_data(command_queue, worker_queue):
+    processed = 0
     while True:
         try:
-            command = command_queue.get(timeout=.01)
+            command = command_queue.get(timeout=0.1)
             if command == "done":
+                print(f"Retriever thread stopping: processed {processed} records")
                 command_queue.task_done()
                 break
             city, recno = command
             url = f'{TOP_API_URL}/record/{city}/{recno}'
+            print(f"Fetching {url}")
             data = get_data_from_server(url)
             if data and 'date' in data and 'temp' in data:
                 worker_queue.put((city, data['date'], data['temp']))
+                processed += 1
+                if processed % 100 == 0:
+                    print(f"Processed {processed} records")
+            else:
+                print(f"Failed to retrieve data for {url}: {data}")
             command_queue.task_done()
         except Empty:
             continue
+        except Exception as e:
+            print(f"Error in retrieve_weather_data: {e}")
 
 # ---------------------------------------------------------------------------
 def retrieve_weather_data(command_queue, worker_queue):
@@ -72,7 +85,7 @@ class Worker(threading.Thread):
     def run(self):
         while True:
             try:
-                item = self.worker_queue.get(timeout=.01)
+                item = self.worker_queue.get(timeout=0.1)
                 if item == "done":
                     self.worker_queue.task_done()
                     break
@@ -162,26 +175,61 @@ def verify_noaa_results(noaa):
     print('===================================')
 
 def main():
-    log = Log(show_terminal=True, filename_log='assignment.log')
-    log.start_timer()
+    try:
+        log = Log(show_terminal=True, filename_log='assignment.log')
+        print("Starting log")
+        log.start_timer()
 
-    noaa = NOAA()
+        noaa = NOAA()
 
-    data = get_data_from_server(f'{TOP_API_URL}/start')
+        print("Sending /start request")
+        print(f"URL: {TOP_API_URL}/start")
+        data = get_data_from_server(f'{TOP_API_URL}/start')
+        print(f"/start response: {data}")
+        if data is None or 'status' not in data or data['status'] != 'OK':
+            raise Exception("Failed to start server: invalid or no response")
 
-    print('Retrieving city details')
-    city_details = {}
-    name = 'City'
-    print(f'{name:>15}: Records')
-    print('===================================')
-    for name in CITIES:
-        city_details[name] = get_data_from_server(f'{TOP_API_URL}/city/{name}')
-        print(f'{name:>15}: Records = {city_details[name]['records']:,}')
-    print('===================================')
+        print('Retrieving city details')
+        city_details = {}
+        name = 'City'
+        print(f'{name:>15}: Records')
+        print('===================================')
+        for name in CITIES:
+            print(f"Requesting city: {name}")
+            city_details[name] = get_data_from_server(f'{TOP_API_URL}/city/{name}')
+            if city_details[name] is None:
+                raise Exception(f"Failed to get city details for {name}")
+            print(f'{name:>15}: Records = {city_details[name]["records"]:,}')
+        print('===================================')
 
-    records = RECORDS_TO_RETRIEVE
+        records = RECORDS_TO_RETRIEVE
+        command_queue = Queue()
+        worker_queue = Queue()
+
+
+        print("Starting retriever threads")
+        retriever_threads = []
+        for _ in range(THREADS):
+            t = threading.Thread(
+                target=retrieve_weather_data,
+                args=(command_queue, worker_queue)
+            )
+            t.daemon = True
+            t.start()
+            retriever_threads.append(t)
+
+        print("Starting worker threads")
+        worker_threads = []
+        for _ in range(WORKERS):
+            w = Worker(worker_queue, noaa)
+            w.start()
+            worker_threads.append(w)
+    except Exception as e:
+        print(f"Error in main: {e}")
+        raise
 
     # TODO - Create any queues, pipes, locks, barriers you need
+
     command_queue = Queue(maxsize=10)
     worker_queue = Queue(maxsize=10)
 
@@ -214,42 +262,36 @@ def main():
     for w in worker_threads:
         w.join()
 
-    retriever_threads = []
-    for _ in range(THREADS):
-        t = threading.Thread(
-            target=retrieve_weather_data,
-            args=(command_queue, worker_queue)
-        )
-        t.daemon = True
-        t.start()
-        retriever_threads.append(t)
+        print("Queueing commands")
+        for city in CITIES:
+            for recno in range(records):
+                command_queue.put((city, recno))
 
-    worker_threads = []
-    for _ in range(WORKERS):
-        w = Worker(worker_queue, noaa)
-        w.start()
-        worker_threads.append(w)
+        print("Waiting for command queue to complete")
+        command_queue.join()
 
-    command_queue.join()
+        for _ in range(THREADS):
+            command_queue.put("done")
 
-    for _ in range(THREADS):
-        command_queue.put("done")
+        for t in retriever_threads:
+            t.join()
 
-    for t in retriever_threads:
-        t.join()
+        for _ in range(WORKERS):
+            worker_queue.put("done")
 
-    for _ in range(WORKERS):
-        worker_queue.put("done")
+        for w in worker_threads:
+            w.join()
 
-    for w in worker_threads:
-        w.join()
+        print("Sending /end request")
+        data = get_data_from_server(f'{TOP_API_URL}/end')
+        if data is None:
+            raise Exception("Failed to get /end response")
+        print(data)
 
-    data = get_data_from_server(f'{TOP_API_URL}/end')
-    print(data)
+        verify_noaa_results(noaa)
 
-    verify_noaa_results(noaa)
-
-    log.stop_timer('Run time: ')
+        log.stop_timer('Run time: ')
+    
 
 if __name__ == '__main__':
     main()
