@@ -25,6 +25,7 @@ from queue import Queue, Empty
 from common import *
 from cse351 import *
 
+<<<<<<< HEAD
 # Configuration
 THREADS = 50
 WORKERS = 10
@@ -66,11 +67,23 @@ def retrieve_weather_data(command_queue, worker_queue, total_records):
     while True:
         try:
             command = command_queue.get(timeout=1.0)
+=======
+# Constants
+THREADS = 5  # Number of retriever threads (optimized for performance)
+WORKERS = 10
+RECORDS_TO_RETRIEVE = 5000  # 5,000 records per city
+
+def retrieve_weather_data(command_queue, worker_queue):
+    while True:
+        try:
+            command = command_queue.get(timeout=1)
+>>>>>>> 0538d1298fcef12353c16c63ce78ea6100653fa3
             if command == "done":
                 command_queue.task_done()
                 break
             city, recno = command
             url = f'{TOP_API_URL}/record/{city}/{recno}'
+<<<<<<< HEAD
             print(f"Fetching {url}")
             sys.stdout.flush()
             data = fetch_with_retry(url)
@@ -78,6 +91,11 @@ def retrieve_weather_data(command_queue, worker_queue, total_records):
                 worker_queue.put((city, data['date'], data['temp']))
             else:
                 logger.warning(f"Invalid data for {url}: {data}")
+=======
+            data = get_data_from_server(url)
+            if data and data.get('status') == 'OK':
+                worker_queue.put((city, data['date'], data['temp']))
+>>>>>>> 0538d1298fcef12353c16c63ce78ea6100653fa3
             command_queue.task_done()
         except Empty:
             continue
@@ -96,7 +114,11 @@ class Worker(threading.Thread):
     def run(self):
         while True:
             try:
+<<<<<<< HEAD
                 item = self.worker_queue.get(timeout=1.0)
+=======
+                item = self.worker_queue.get(timeout=1)
+>>>>>>> 0538d1298fcef12353c16c63ce78ea6100653fa3
                 if item == "done":
                     self.worker_queue.task_done()
                     break
@@ -125,8 +147,13 @@ class NOAA:
             if not records:
                 logger.warning(f"No records for {city}")
                 return 0.0
+<<<<<<< HEAD
             temps = [temp for _, temp in records]
             return sum(temps) / len(records)
+=======
+            total_temp = sum(temp for _, temp in records)
+            return total_temp / len(records) if records else 0.0
+>>>>>>> 0538d1298fcef12353c16c63ce78ea6100653fa3
 
 def verify_noaa_results(noaa):
     """Verify computed average temperatures against expected values."""
@@ -142,10 +169,15 @@ def verify_noaa_results(noaa):
         'los_angeles': 15.2346,
         'phoenix': 12.4404,
     }
+<<<<<<< HEAD
     print("\nNOAA Results: Verifying Results")
     sys.stdout.flush()
     logger.info("\nNOAA Results: Verifying Results")
     logger.info("=" * 35)
+=======
+    print('\nNOAA Results: Verifying Results')
+    print('===================================')
+>>>>>>> 0538d1298fcef12353c16c63ce78ea6100653fa3
     for name in CITIES:
         answer = answers[name]
         avg = noaa.get_temp_details(name)
@@ -155,11 +187,17 @@ def verify_noaa_results(noaa):
         if abs(avg - answer) > VERIFICATION_TOLERANCE:
             msg = f"FAILED  Expected {answer}"
         else:
+<<<<<<< HEAD
             msg = "PASSED"
         logger.info(f"{name:>15}: {avg:<10.4f} {msg}")
         print(f"{name:>15}: {avg:<10.4f} {msg}")
     logger.info("=" * 35)
     sys.stdout.flush()
+=======
+            msg = f'PASSED'
+        print(f'{name:>15}: {avg:<10.4f} {msg}')
+    print('===================================')
+>>>>>>> 0538d1298fcef12353c16c63ce78ea6100653fa3
 
 def initialize_server():
     """Initialize server and fetch city details."""
@@ -188,6 +226,41 @@ def start_threads(noaa, command_queue, worker_queue, total_records):
     logger.info(f"Starting {THREADS} retriever threads")
     retriever_threads = []
     try:
+<<<<<<< HEAD
+=======
+        log = Log(show_terminal=True, filename_log='assignment.log')
+        print("Starting log")
+        log.start_timer()
+
+        noaa = NOAA()
+
+        # Send /start request
+        print("Sending /start request")
+        data = get_data_from_server(f'{TOP_API_URL}/start')
+        print(f"/start response: {data}")
+        if data is None or data.get('status') != 'OK':
+            raise Exception("Failed to start server: invalid or no response")
+
+        # Retrieve city details
+        print('Retrieving city details')
+        print(f'{"City":>15}: Records')
+        print('===================================')
+        city_details = {}
+        for name in CITIES:
+            city_details[name] = get_data_from_server(f'{TOP_API_URL}/city/{name}')
+            if city_details[name] is None:
+                raise Exception(f"Failed to get city details for {name}")
+            print(f'{name:>15}: Records = {city_details[name]["records"]:,}')
+        print('===================================')
+
+        # Create queues
+        command_queue = Queue(maxsize=10)
+        worker_queue = Queue(maxsize=10)
+
+        # Start retriever threads
+        print("Starting retriever threads")
+        retriever_threads = []
+>>>>>>> 0538d1298fcef12353c16c63ce78ea6100653fa3
         for _ in range(THREADS):
             t = threading.Thread(
                 target=retrieve_weather_data,
@@ -201,13 +274,20 @@ def start_threads(noaa, command_queue, worker_queue, total_records):
         traceback.print_exc()
         raise
 
+<<<<<<< HEAD
     logger.info(f"Starting {WORKERS} worker threads")
     worker_threads = []
     try:
+=======
+        # Start worker threads
+        print("Starting worker threads")
+        worker_threads = []
+>>>>>>> 0538d1298fcef12353c16c63ce78ea6100653fa3
         for _ in range(WORKERS):
             w = Worker(worker_queue, noaa)
             w.start()
             worker_threads.append(w)
+<<<<<<< HEAD
     except Exception as e:
         logger.error(f"Failed to start worker threads: {type(e).__name__}: {str(e)}")
         traceback.print_exc()
@@ -270,10 +350,47 @@ def main():
         retriever_threads, worker_threads = start_threads(noaa, command_queue, worker_queue, total_records)
         queue_commands(command_queue, CITIES, RECORDS_TO_RETRIEVE)
         shutdown_threads(command_queue, worker_queue, retriever_threads, worker_threads)
+=======
 
+        # Populate command queue
+        print("Queueing commands")
+        for city in CITIES:
+            for recno in range(RECORDS_TO_RETRIEVE):
+                command_queue.put((city, recno))
+
+        # Wait for command queue to complete
+        print("Waiting for command queue to complete")
+        command_queue.join()
+
+        # Signal retriever threads to stop
+        for _ in range(THREADS):
+            command_queue.put("done")
+
+        # Wait for retriever threads to finish
+        for t in retriever_threads:
+            t.join()
+
+        # Signal worker threads to stop
+        for _ in range(WORKERS):
+            worker_queue.put("done")
+
+        # Wait for worker threads to finish
+        for w in worker_threads:
+            w.join()
+
+        # Send /end request
+        print("Sending /end request")
+        data = get_data_from_server(f'{TOP_API_URL}/end')
+        if data is None:
+            raise Exception("Failed to get /end response")
+        print(data)
+>>>>>>> 0538d1298fcef12353c16c63ce78ea6100653fa3
+
+        # Verify results
         verify_noaa_results(noaa)
 
         log.stop_timer('Run time: ')
+<<<<<<< HEAD
         logger.info("Program completed successfully")
         print("Program completed successfully")
         sys.stdout.flush()
@@ -282,6 +399,11 @@ def main():
         print(f"Error in main: {e}")
         traceback.print_exc()
         sys.stdout.flush()
+=======
+
+    except Exception as e:
+        print(f"Error in main: {e}")
+>>>>>>> 0538d1298fcef12353c16c63ce78ea6100653fa3
         raise
 
 if __name__ == '__main__':
