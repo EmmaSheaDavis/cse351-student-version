@@ -1,0 +1,168 @@
+2025-05-17 12:23:30,103 [INFO] Starting log
+2025-05-17 12:23:30,104 [INFO] Sending /start request
+2025-05-17 12:23:30,134 [INFO] /start response: {'status': 'OK'}
+2025-05-17 12:23:30,134 [INFO] Retrieving city details
+2025-05-17 12:23:30,134 [INFO]            City: Records
+2025-05-17 12:23:30,134 [INFO] ===================================
+2025-05-17 12:23:30,136 [INFO]        sandiego: Records = 10,000
+2025-05-17 12:23:30,137 [INFO]    philadelphia: Records = 10,000
+2025-05-17 12:23:30,138 [INFO]     san_antonio: Records = 10,000
+2025-05-17 12:23:30,139 [INFO]        san_jose: Records = 10,000
+2025-05-17 12:23:30,140 [INFO]        new_york: Records = 10,000
+2025-05-17 12:23:30,140 [INFO]         houston: Records = 10,000
+2025-05-17 12:23:30,141 [INFO]          dallas: Records = 10,000
+2025-05-17 12:23:30,142 [INFO]         chicago: Records = 10,000
+2025-05-17 12:23:30,143 [INFO]     los_angeles: Records = 10,000
+2025-05-17 12:23:30,144 [INFO]         phoenix: Records = 10,000
+2025-05-17 12:23:30,144 [INFO] ===================================
+2025-05-17 12:23:30,144 [ERROR] Error in main: name 't' is not defined
+2025-05-17 12:26:03,641 [INFO] Thread-8565312640: Starting log
+2025-05-17 12:26:03,641 [INFO] Thread-8565312640: Sending /start request: http://127.0.0.1:8123/start
+2025-05-17 12:26:03,697 [INFO] Thread-8565312640: /start response: {'status': 'OK'}
+2025-05-17 12:26:03,697 [INFO] Thread-8565312640: Retrieving city details
+2025-05-17 12:26:03,697 [INFO] Thread-8565312640:            City: Records
+2025-05-17 12:26:03,697 [INFO] Thread-8565312640: ===================================
+2025-05-17 12:26:03,699 [INFO] Thread-8565312640:        sandiego: Records = 10,000
+2025-05-17 12:26:03,706 [INFO] Thread-8565312640:    philadelphia: Records = 10,000
+2025-05-17 12:26:03,707 [INFO] Thread-8565312640:     san_antonio: Records = 10,000
+2025-05-17 12:26:03,708 [INFO] Thread-8565312640:        san_jose: Records = 10,000
+2025-05-17 12:26:03,709 [INFO] Thread-8565312640:        new_york: Records = 10,000
+2025-05-17 12:26:03,710 [INFO] Thread-8565312640:         houston: Records = 10,000
+2025-05-17 12:26:03,712 [INFO] Thread-8565312640:          dallas: Records = 10,000
+2025-05-17 12:26:03,713 [INFO] Thread-8565312640:         chicago: Records = 10,000
+2025-05-17 12:26:03,714 [INFO] Thread-8565312640:     los_angeles: Records = 10,000
+2025-05-17 12:26:03,715 [INFO] Thread-8565312640:         phoenix: Records = 10,000
+2025-05-17 12:26:03,715 [INFO] Thread-8565312640: ===================================
+2025-05-17 12:26:03,715 [INFO] Thread-8565312640: Starting 5 retriever threads
+2025-05-17 12:26:03,716 [INFO] Thread-8565312640: Starting 2 worker threads
+2025-05-17 12:26:03,716 [INFO] Thread-6264336384: Worker thread started
+2025-05-17 12:26:03,716 [INFO] Thread-6281162752: Worker thread started
+2025-05-17 12:26:03,716 [INFO] Thread-8565312640: Queueing commands
+2025-05-17 12:26:04,840 [INFO] Thread-6247510016: Processed 10/1000 records
+2025-05-17 12:26:04,847 [INFO] Thread-6180204544: Processed 10/1000 records
+2025-05-17 12:26:04,847 [INFO] Thread-6213857280: Processed 10/1000 records
+2025-05-17 12:26:04,847 [INFO] Thread-6197030912: Processed 10/1000 records
+2025-05-17 12:26:04,848 [INFO] Thread-6230683648: Processed 10/1000 records
+2025-05-17 12:26:05,928 [INFO] Thread-6247510016: Processed 20/1000 records
+2025-05-17 12:26:05,928 [INFO] Thread-6213857280: Processed 20/1000 records
+2025-05-17 12:26:05,959 [INFO] Thread-6180204544: Processed 20/1000 records
+2025-05-17 12:26:05,960 [INFO] Thread-6197030912: Processed 20/1000 records
+2025-05-17 12:26:05,960 [INFO] Thread-6230683648: Processed 20/1000 records
+2025-05-17 12:26:07,105 [INFO] Thread-6230683648: Processed 30/1000 records
+2025-05-17 12:26:07,105 [INFO] Thread-6197030912: Processed 30/1000 records
+2025-05-17 12:26:07,106 [INFO] Thread-6213857280: Processed 30/1000 records
+2025-05-17 12:26:07,106 [INFO] Thread-6180204544: Processed 30/1000 records
+2025-05-17 12:26:07,106 [INFO] Thread-6247510016: Processed 30/1000 records
+2025-05-17 12:26:08,235 [INFO] Thread-6213857280: Processed 40/1000 records
+2025-05-17 12:26:08,237 [INFO] Thread-6230683648: Processed 40/1000 records
+2025-05-17 12:26:08,246 [INFO] Thread-6197030912: Processed 40/1000 records
+2025-05-17 12:26:08,247 [INFO] Thread-6247510016: Processed 40/1000 records
+2025-05-17 12:26:08,248 [INFO] Thread-6180204544: Processed 40/1000 records
+2025-05-17 12:26:09,347 [INFO] Thread-6180204544: Processed 50/1000 records
+2025-05-17 12:26:09,352 [INFO] Thread-6197030912: Processed 50/1000 records
+2025-05-17 12:26:09,353 [INFO] Thread-6230683648: Processed 50/1000 records
+2025-05-17 12:26:09,354 [INFO] Thread-6247510016: Processed 50/1000 records
+2025-05-17 12:26:09,354 [INFO] Thread-6213857280: Processed 50/1000 records
+2025-05-17 12:26:10,439 [INFO] Thread-6180204544: Processed 60/1000 records
+2025-05-17 12:26:10,468 [INFO] Thread-6213857280: Processed 60/1000 records
+2025-05-17 12:26:10,469 [INFO] Thread-6197030912: Processed 60/1000 records
+2025-05-17 12:26:10,469 [INFO] Thread-6247510016: Processed 60/1000 records
+2025-05-17 12:26:10,469 [INFO] Thread-6230683648: Processed 60/1000 records
+2025-05-17 12:26:11,525 [INFO] Thread-6180204544: Processed 70/1000 records
+2025-05-17 12:26:11,607 [INFO] Thread-6247510016: Processed 70/1000 records
+2025-05-17 12:26:11,609 [INFO] Thread-6213857280: Processed 70/1000 records
+2025-05-17 12:26:11,609 [INFO] Thread-6197030912: Processed 70/1000 records
+2025-05-17 12:26:11,610 [INFO] Thread-6230683648: Processed 70/1000 records
+2025-05-17 12:26:12,640 [INFO] Thread-6180204544: Processed 80/1000 records
+2025-05-17 12:26:12,759 [INFO] Thread-6197030912: Processed 80/1000 records
+2025-05-17 12:26:12,761 [INFO] Thread-6213857280: Processed 80/1000 records
+2025-05-17 12:26:12,761 [INFO] Thread-6247510016: Processed 80/1000 records
+2025-05-17 12:26:12,761 [INFO] Thread-6230683648: Processed 80/1000 records
+2025-05-17 12:26:13,809 [INFO] Thread-6180204544: Processed 90/1000 records
+2025-05-17 12:26:13,920 [INFO] Thread-6213857280: Processed 90/1000 records
+2025-05-17 12:26:13,920 [INFO] Thread-6197030912: Processed 90/1000 records
+2025-05-17 12:26:13,921 [INFO] Thread-6230683648: Processed 90/1000 records
+2025-05-17 12:26:13,922 [INFO] Thread-6247510016: Processed 90/1000 records
+2025-05-17 12:26:14,910 [INFO] Thread-6180204544: Processed 100/1000 records
+2025-05-17 12:26:15,020 [INFO] Thread-6247510016: Processed 100/1000 records
+2025-05-17 12:26:15,020 [INFO] Thread-6197030912: Processed 100/1000 records
+2025-05-17 12:26:15,023 [INFO] Thread-6230683648: Processed 100/1000 records
+2025-05-17 12:26:15,028 [INFO] Thread-6213857280: Processed 100/1000 records
+2025-05-17 12:26:16,019 [INFO] Thread-6180204544: Processed 110/1000 records
+2025-05-17 12:26:16,102 [INFO] Thread-6197030912: Processed 110/1000 records
+2025-05-17 12:26:16,129 [INFO] Thread-6213857280: Processed 110/1000 records
+2025-05-17 12:26:16,133 [INFO] Thread-6230683648: Processed 110/1000 records
+2025-05-17 12:26:16,134 [INFO] Thread-6247510016: Processed 110/1000 records
+2025-05-17 12:26:17,153 [INFO] Thread-6180204544: Processed 120/1000 records
+2025-05-17 12:26:17,180 [INFO] Thread-6197030912: Processed 120/1000 records
+2025-05-17 12:26:17,265 [INFO] Thread-6247510016: Processed 120/1000 records
+2025-05-17 12:26:17,268 [INFO] Thread-6230683648: Processed 120/1000 records
+2025-05-17 12:26:17,269 [INFO] Thread-6213857280: Processed 120/1000 records
+2025-05-17 12:26:18,302 [INFO] Thread-6197030912: Processed 130/1000 records
+2025-05-17 12:26:18,305 [INFO] Thread-6180204544: Processed 130/1000 records
+2025-05-17 12:26:18,417 [INFO] Thread-6230683648: Processed 130/1000 records
+2025-05-17 12:26:18,418 [INFO] Thread-6213857280: Processed 130/1000 records
+2025-05-17 12:26:18,419 [INFO] Thread-6247510016: Processed 130/1000 records
+2025-05-17 12:26:19,445 [INFO] Thread-6197030912: Processed 140/1000 records
+2025-05-17 12:26:19,446 [INFO] Thread-6180204544: Processed 140/1000 records
+2025-05-17 12:26:19,559 [INFO] Thread-6247510016: Processed 140/1000 records
+2025-05-17 12:26:19,560 [INFO] Thread-6213857280: Processed 140/1000 records
+2025-05-17 12:26:19,560 [INFO] Thread-6230683648: Processed 140/1000 records
+2025-05-17 12:26:20,595 [INFO] Thread-6180204544: Processed 150/1000 records
+2025-05-17 12:26:20,595 [INFO] Thread-6197030912: Processed 150/1000 records
+2025-05-17 12:26:20,708 [INFO] Thread-6230683648: Processed 150/1000 records
+2025-05-17 12:26:20,713 [INFO] Thread-6213857280: Processed 150/1000 records
+2025-05-17 12:26:20,715 [INFO] Thread-6247510016: Processed 150/1000 records
+2025-05-17 12:26:21,693 [INFO] Thread-6180204544: Processed 160/1000 records
+2025-05-17 12:26:21,709 [INFO] Thread-6197030912: Processed 160/1000 records
+2025-05-17 12:26:21,798 [INFO] Thread-6230683648: Processed 160/1000 records
+2025-05-17 12:26:21,819 [INFO] Thread-6247510016: Processed 160/1000 records
+2025-05-17 12:26:21,819 [INFO] Thread-6213857280: Processed 160/1000 records
+2025-05-17 12:26:22,799 [INFO] Thread-6180204544: Processed 170/1000 records
+2025-05-17 12:26:22,831 [INFO] Thread-6197030912: Processed 170/1000 records
+2025-05-17 12:26:22,908 [INFO] Thread-6230683648: Processed 170/1000 records
+2025-05-17 12:26:22,935 [INFO] Thread-6247510016: Processed 170/1000 records
+2025-05-17 12:26:22,941 [INFO] Thread-6213857280: Processed 170/1000 records
+2025-05-17 12:26:23,892 [INFO] Thread-6180204544: Processed 180/1000 records
+2025-05-17 12:26:23,908 [INFO] Thread-8565312640: Waiting for command queue to complete
+2025-05-17 12:26:23,913 [INFO] Thread-6197030912: Processed 180/1000 records
+2025-05-17 12:26:24,003 [INFO] Thread-6230683648: Processed 180/1000 records
+2025-05-17 12:26:24,013 [INFO] Thread-6247510016: Processed 180/1000 records
+2025-05-17 12:26:24,020 [INFO] Thread-6213857280: Processed 180/1000 records
+2025-05-17 12:26:25,015 [INFO] Thread-6180204544: Processed 190/1000 records
+2025-05-17 12:26:25,016 [INFO] Thread-6197030912: Processed 190/1000 records
+2025-05-17 12:26:25,129 [INFO] Thread-6247510016: Processed 190/1000 records
+2025-05-17 12:26:25,129 [INFO] Thread-6213857280: Processed 190/1000 records
+2025-05-17 12:26:25,130 [INFO] Thread-6230683648: Processed 190/1000 records
+2025-05-17 12:26:26,179 [INFO] Thread-6180204544: Processed 200/1000 records
+2025-05-17 12:26:26,181 [INFO] Thread-6197030912: Processed 200/1000 records
+2025-05-17 12:26:26,187 [INFO] Thread-8565312640: Sending 'done' to retriever threads
+2025-05-17 12:26:26,187 [INFO] Thread-6180204544: Retriever thread stopping: processed 200 records
+2025-05-17 12:26:26,187 [INFO] Thread-6197030912: Retriever thread stopping: processed 200 records
+2025-05-17 12:26:26,289 [INFO] Thread-6247510016: Processed 200/1000 records
+2025-05-17 12:26:26,290 [INFO] Thread-6213857280: Processed 200/1000 records
+2025-05-17 12:26:26,290 [INFO] Thread-6247510016: Retriever thread stopping: processed 200 records
+2025-05-17 12:26:26,290 [INFO] Thread-6213857280: Retriever thread stopping: processed 200 records
+2025-05-17 12:26:26,290 [INFO] Thread-6230683648: Processed 200/1000 records
+2025-05-17 12:26:26,291 [INFO] Thread-6230683648: Retriever thread stopping: processed 200 records
+2025-05-17 12:26:26,291 [INFO] Thread-8565312640: Sending 'done' to worker threads
+2025-05-17 12:26:26,292 [INFO] Thread-6281162752: Worker thread stopping
+2025-05-17 12:26:26,292 [INFO] Thread-6264336384: Worker thread stopping
+2025-05-17 12:26:26,292 [INFO] Thread-8565312640: Sending /end request
+2025-05-17 12:26:26,303 [INFO] Thread-8565312640: /end response: {'status': 'OK', 'api': 1012, 'threads': 5, 'total_time': 22.599156856536865, 'calls_per_second': 44.78043169594074}
+2025-05-17 12:26:26,305 [INFO] Thread-8565312640: 
+NOAA Results: Verifying Results
+2025-05-17 12:26:26,306 [INFO] Thread-8565312640: ===================================
+2025-05-17 12:26:26,306 [INFO] Thread-8565312640:        sandiego: 13.8000    FAILED  Expected 14.5004
+2025-05-17 12:26:26,306 [INFO] Thread-8565312640:    philadelphia: 14.0800    FAILED  Expected 14.865
+2025-05-17 12:26:26,306 [INFO] Thread-8565312640:     san_antonio: 17.0100    FAILED  Expected 14.638
+2025-05-17 12:26:26,306 [INFO] Thread-8565312640:        san_jose: 15.2800    FAILED  Expected 14.5756
+2025-05-17 12:26:26,307 [INFO] Thread-8565312640:        new_york: 14.6400    FAILED  Expected 14.6472
+2025-05-17 12:26:26,307 [INFO] Thread-8565312640:         houston: 13.3600    FAILED  Expected 14.591
+2025-05-17 12:26:26,307 [INFO] Thread-8565312640:          dallas: 12.8700    FAILED  Expected 14.835
+2025-05-17 12:26:26,307 [INFO] Thread-8565312640:         chicago: 14.6400    FAILED  Expected 14.6584
+2025-05-17 12:26:26,307 [INFO] Thread-8565312640:     los_angeles: 15.8800    FAILED  Expected 15.2346
+2025-05-17 12:26:26,307 [INFO] Thread-8565312640:         phoenix: 12.9000    FAILED  Expected 12.4404
+2025-05-17 12:26:26,307 [INFO] Thread-8565312640: ===================================
+2025-05-17 12:26:26,307 [INFO] Thread-8565312640: Run time:  = 22.66611271
+2025-05-17 12:26:26,309 [INFO] Thread-8565312640: Program completed successfully
