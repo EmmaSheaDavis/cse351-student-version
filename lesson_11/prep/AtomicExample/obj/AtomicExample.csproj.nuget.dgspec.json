@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/sithmando/cse351-student-version/lesson_11/prep/AtomicExample/AtomicExample.csproj": {}
+    "/Users/sithmando/Documents/cse351-student-version/lesson_11/prep/AtomicExample/AtomicExample.csproj": {}
   },
   "projects": {
-    "/Users/sithmando/cse351-student-version/lesson_11/prep/AtomicExample/AtomicExample.csproj": {
+    "/Users/sithmando/Documents/cse351-student-version/lesson_11/prep/AtomicExample/AtomicExample.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/sithmando/cse351-student-version/lesson_11/prep/AtomicExample/AtomicExample.csproj",
+        "projectUniqueName": "/Users/sithmando/Documents/cse351-student-version/lesson_11/prep/AtomicExample/AtomicExample.csproj",
         "projectName": "AtomicExample",
-        "projectPath": "/Users/sithmando/cse351-student-version/lesson_11/prep/AtomicExample/AtomicExample.csproj",
+        "projectPath": "/Users/sithmando/Documents/cse351-student-version/lesson_11/prep/AtomicExample/AtomicExample.csproj",
         "packagesPath": "/Users/sithmando/.nuget/packages/",
-        "outputPath": "/Users/sithmando/cse351-student-version/lesson_11/prep/AtomicExample/obj/",
+        "outputPath": "/Users/sithmando/Documents/cse351-student-version/lesson_11/prep/AtomicExample/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/sithmando/.nuget/NuGet/NuGet.Config"

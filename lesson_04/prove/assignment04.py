@@ -23,7 +23,7 @@ from common import *
 from cse351 import *
 
 # Configuration
-THREADS = 4
+THREADS = 1000
 WORKERS = 4
 RECORDS_TO_RETRIEVE = 5000  
 QUEUE_SIZE = 5
