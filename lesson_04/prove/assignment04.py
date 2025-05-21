@@ -1,7 +1,7 @@
 """
 Course    : CSE 351
 Assignment: 04
-Student   : Emma Davis
+Student   : <your name here>
 
 Instructions:
     - review instructions in the course
@@ -22,30 +22,45 @@ from queue import Queue, Empty
 from common import *
 from cse351 import *
 
-# Constants
-THREADS = 5  # Number of retriever threads (optimized for performance)
-WORKERS = 10
-RECORDS_TO_RETRIEVE = 5000  # 5,000 records per city
+# Configuration
+THREADS = 1000
+WORKERS = 4
+RECORDS_TO_RETRIEVE = 5000  
+QUEUE_SIZE = 5
+JOIN_TIMEOUT = 10
 
+# Barriers for synchronization
+RETRIEVER_BARRIER = threading.Barrier(THREADS + 1)  # +1 for main thread
+WORKER_BARRIER = threading.Barrier(WORKERS + 1)    # +1 for main thread
+
+# ---------------------------------------------------------------------------
 def retrieve_weather_data(command_queue, worker_queue):
+    """Retriever thread to fetch weather data from server."""
     while True:
         try:
-            command = command_queue.get(timeout=1)
+            command = command_queue.get(timeout=0.5)
             if command == "done":
                 command_queue.task_done()
                 break
             city, recno = command
             url = f'{TOP_API_URL}/record/{city}/{recno}'
+            print(f"Fetching {url}")
             data = get_data_from_server(url)
-            if data and data.get('status') == 'OK':
+            if data and 'date' in data and 'temp' in data:
                 worker_queue.put((city, data['date'], data['temp']))
+            else:
+                print(f"Invalid data for {url}: {data}")
             command_queue.task_done()
         except Empty:
             continue
         except Exception as e:
-            print(f"Error in retrieve_weather_data: {e}")
+            print(f"Error in retrieve_weather_data: {type(e).__name__}: {str(e)}")
+    print("Retriever thread reached barrier")
+    RETRIEVER_BARRIER.wait()
 
+# ---------------------------------------------------------------------------
 class Worker(threading.Thread):
+    """Worker thread to process weather data and store in NOAA."""
     def __init__(self, worker_queue, noaa):
         super().__init__()
         self.worker_queue = worker_queue
@@ -55,7 +70,7 @@ class Worker(threading.Thread):
     def run(self):
         while True:
             try:
-                item = self.worker_queue.get(timeout=1)
+                item = self.worker_queue.get(timeout=0.5)
                 if item == "done":
                     self.worker_queue.task_done()
                     break
@@ -64,8 +79,14 @@ class Worker(threading.Thread):
                 self.worker_queue.task_done()
             except Empty:
                 continue
+            except Exception as e:
+                print(f"Error in worker: {type(e).__name__}: {str(e)}")
+        print("Worker thread reached barrier")
+        WORKER_BARRIER.wait()
 
+# ---------------------------------------------------------------------------
 class NOAA:
+    """Stores weather data and computes average temperatures."""
     def __init__(self):
         self.weather_data = {city: [] for city in CITIES}
         self.lock = threading.Lock()
@@ -78,11 +99,14 @@ class NOAA:
         with self.lock:
             records = self.weather_data[city]
             if not records:
+                print(f"No records for {city}")
                 return 0.0
             total_temp = sum(temp for _, temp in records)
             return total_temp / len(records) if records else 0.0
 
+# ---------------------------------------------------------------------------
 def verify_noaa_results(noaa):
+    """Verify computed average temperatures against expected values."""
     answers = {
         'sandiego': 14.5004,
         'philadelphia': 14.865,
@@ -95,7 +119,8 @@ def verify_noaa_results(noaa):
         'los_angeles': 15.2346,
         'phoenix': 12.4404,
     }
-    print('\nNOAA Results: Verifying Results')
+    print()
+    print('NOAA Results: Verifying Results')
     print('===================================')
     for name in CITIES:
         answer = answers[name]
@@ -104,101 +129,85 @@ def verify_noaa_results(noaa):
             msg = f'FAILED  Expected {answer}'
         else:
             msg = f'PASSED'
-        print(f'{name:>15}: {avg:<10.4f} {msg}')
+        print(f'{name:>15}: {avg:<10} {msg}')
     print('===================================')
 
+# ---------------------------------------------------------------------------
 def main():
-    try:
-        log = Log(show_terminal=True, filename_log='assignment.log')
-        print("Starting log")
-        log.start_timer()
+    log = Log(show_terminal=True, filename_log='assignment.log')
+    log.start_timer()
 
-        noaa = NOAA()
+    noaa = NOAA()
 
-        # Send /start request
-        print("Sending /start request")
-        data = get_data_from_server(f'{TOP_API_URL}/start')
-        print(f"/start response: {data}")
-        if data is None or data.get('status') != 'OK':
-            raise Exception("Failed to start server: invalid or no response")
+    # Start server
+    data = get_data_from_server(f'{TOP_API_URL}/start')
+    print(f"/start response: {data}")
+    if data is None or data.get('status') != 'OK':
+        raise Exception("Failed to start server: invalid or no response")
 
-        # Retrieve city details
-        print('Retrieving city details')
-        print(f'{"City":>15}: Records')
-        print('===================================')
-        city_details = {}
-        for name in CITIES:
-            city_details[name] = get_data_from_server(f'{TOP_API_URL}/city/{name}')
-            if city_details[name] is None:
-                raise Exception(f"Failed to get city details for {name}")
-            print(f'{name:>15}: Records = {city_details[name]["records"]:,}')
-        print('===================================')
+    # Get all cities number of records
+    print('Retrieving city details')
+    city_details = {}
+    name = 'City'
+    print(f'{name:>15}: Records')
+    print('===================================')
+    for name in CITIES:
+        city_details[name] = get_data_from_server(f'{TOP_API_URL}/city/{name}')
+        print(f'{name:>15}: Records = {city_details[name]['records']:,}')
+    print('===================================')
 
-        # Create queues
-        command_queue = Queue(maxsize=10)
-        worker_queue = Queue(maxsize=10)
+    records = RECORDS_TO_RETRIEVE
 
-        # Start retriever threads
-        print("Starting retriever threads")
-        retriever_threads = []
-        for _ in range(THREADS):
-            t = threading.Thread(
-                target=retrieve_weather_data,
-                args=(command_queue, worker_queue)
-            )
-            t.daemon = True
-            t.start()
-            retriever_threads.append(t)
+    # Create queues and barriers
+    command_queue = Queue(maxsize=QUEUE_SIZE)
+    worker_queue = Queue(maxsize=QUEUE_SIZE)
 
-        # Start worker threads
-        print("Starting worker threads")
-        worker_threads = []
-        for _ in range(WORKERS):
-            w = Worker(worker_queue, noaa)
-            w.start()
-            worker_threads.append(w)
+    # Start retriever threads
+    print("Starting retriever threads")
+    retriever_threads = []
+    for _ in range(THREADS):
+        t = threading.Thread(target=retrieve_weather_data, args=(command_queue, worker_queue))
+        t.daemon = True
+        t.start()
+        retriever_threads.append(t)
 
-        # Populate command queue
-        print("Queueing commands")
-        for city in CITIES:
-            for recno in range(RECORDS_TO_RETRIEVE):
-                command_queue.put((city, recno))
+    # Start worker threads
+    print("Starting worker threads")
+    worker_threads = []
+    for _ in range(WORKERS):
+        w = Worker(worker_queue, noaa)
+        w.start()
+        worker_threads.append(w)
 
-        # Wait for command queue to complete
-        print("Waiting for command queue to complete")
-        command_queue.join()
+    # Queue commands
+    print("Queueing commands")
+    for city in CITIES:
+        for recno in range(records):
+            command_queue.put((city, recno))
 
-        # Signal retriever threads to stop
-        for _ in range(THREADS):
-            command_queue.put("done")
+    # Shutdown threads
+    print("Shutting down threads")
+    print("Sending 'done' to retriever threads")
+    for _ in range(THREADS):
+        command_queue.put("done")
+    RETRIEVER_BARRIER.wait()  # Wait for all retrievers to finish
+    for t in retriever_threads:
+        t.join()
 
-        # Wait for retriever threads to finish
-        for t in retriever_threads:
-            t.join()
+    print("Sending 'done' to worker threads")
+    for _ in range(WORKERS):
+        worker_queue.put("done")
+    WORKER_BARRIER.wait()  # Wait for all workers to finish
+    for w in worker_threads:
+        w.join()
 
-        # Signal worker threads to stop
-        for _ in range(WORKERS):
-            worker_queue.put("done")
+    # End server
+    data = get_data_from_server(f'{TOP_API_URL}/end')
+    print(data)
 
-        # Wait for worker threads to finish
-        for w in worker_threads:
-            w.join()
+    verify_noaa_results(noaa)
 
-        # Send /end request
-        print("Sending /end request")
-        data = get_data_from_server(f'{TOP_API_URL}/end')
-        if data is None:
-            raise Exception("Failed to get /end response")
-        print(data)
-
-        # Verify results
-        verify_noaa_results(noaa)
-
-        log.stop_timer('Run time: ')
-
-    except Exception as e:
-        print(f"Error in main: {e}")
-        raise
+    log.stop_timer('Run time: ')
 
 if __name__ == '__main__':
     main()
