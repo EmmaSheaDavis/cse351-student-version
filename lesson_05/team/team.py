@@ -14,7 +14,6 @@ Instructions:
 from datetime import datetime, timedelta
 import multiprocessing as mp
 import random
-from matplotlib.pylab import plt  # load plot library
 
 
 # Include cse 351 common Python files
@@ -43,16 +42,24 @@ def main():
 
     start = 10000000000
     range_count = 100000
-    numbers_processed = 0
-    for i in range(start, start + range_count):
-        numbers_processed += 1
-        if is_prime(i):
-            prime_count += 1
-            print(i, end=', ', flush=True)
-    print(flush=True)
+    numbers = list(range(start, start + range_count + 1))
 
-    end_time = time.time()
-    elapsed_time = end_time - start_time
+    for num_processes in range(1, mp.cpu_count() + 1):
+        print(f"Pool of {num_processes:2} CPU Cores")
+        xaxis_cpus.append(num_processes)
+
+        start_time = datetime.now()
+        with mp.Pool(processes=num_processes) as p:
+            results = p.map(is_prime, numbers)
+
+        primes = [num for num, is_prime in zip(numbers, results) if is_prime]
+        primes_found = len(primes)
+        end_time = datetime.now()
+        elapsed_time = (end_time - start_time).total_seconds()
+        yaxis_times.append(elapsed_time)
+
+        print(f"Primes Found: {primes_found}")
+        print(f"Time Taken: {elapsed_time:.2f} seconds")
 
     # create plot of results and also save it to a PNG file
     plt.plot(xaxis_cpus, yaxis_times)
