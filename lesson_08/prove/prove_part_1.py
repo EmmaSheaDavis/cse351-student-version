@@ -2,7 +2,7 @@
 Course: CSE 251 
 Assignment: 08 Prove Part 1
 File:   prove_part_1.py
-Author: <Add name here>
+Author: Emma Davis
 
 Purpose: Part 1 of assignment 8, finding the path to the end of a maze using recursion.
 
@@ -28,34 +28,63 @@ SLOW_SPEED = 100
 FAST_SPEED = 1
 speed = SLOW_SPEED
 
-# TODO: Add any functions needed here.
-
 def solve_path(maze):
     """ Solve the maze and return the path found between the start and end positions.  
         The path is a list of positions, (x, y) """
     path = []
-    # TODO: Solve the maze recursively while tracking the correct path.
-
-    # Hint: You can create an inner function to do the recursion
-
+    visited = set()  # Track visited positions to avoid cycles
+    
+    def explore(x, y):
+        """ Recursively explore the maze from position (x, y). Returns True if a path is found. """
+        # If position is already visited or not open, stop this path
+        if (x, y) in visited or not maze.can_move_here(x, y):
+            return False
+        
+        # Base case: if current position is the end, we found the path
+        if maze.at_end(x, y):
+            path.append((x, y))  # Add end position to path
+            return True
+        
+        # Mark current position as visited and draw it (grey for visited)
+        visited.add((x, y))
+        maze.restore(x, y)  # Use restore to mark visited cells in grey
+        
+        # Get possible moves (neighbors: up, down, left, right)
+        neighbors = maze.get_possible_moves(x, y)
+        
+        # Explore each neighbor
+        for next_x, next_y in neighbors:
+            if explore(next_x, next_y):  # If a path is found through this neighbor
+                path.append((x, y))  # Add current position to path
+                return True
+        
+        return False
+    start_x, start_y = maze.get_start_pos()
+    # Check if start position is valid
+    if not maze.can_move_here(start_x, start_y):
+        return path
+    
+    # Explore from the start
+    if explore(start_x, start_y):
+        # If a path is found, add start to path and draw the entire path in blue
+        path.append((start_x, start_y))
+        path.reverse()  # Reverse to get start-to-end order
+        # Draw the entire path in blue
+        for x, y in path:
+            maze.move(x, y, COLOR)  # Draw each position in blue
+    else:
+        path = []  # Clear path if no solution exists
+    
     return path
-
 
 def get_path(log, filename):
     """ Do not change this function """
-    # 'Maze: Press "q" to quit, "1" slow drawing, "2" faster drawing, "p" to play again'
     global speed
-
-    # create a Screen Object that will contain all of the drawing commands
     screen = Screen(SCREEN_SIZE, SCREEN_SIZE)
     screen.background((255, 255, 0))
-
     maze = Maze(screen, SCREEN_SIZE, SCREEN_SIZE, filename)
-
     path = solve_path(maze)
-
     log.write(f'Drawing commands to solve = {screen.get_command_count()}')
-
     done = False
     while not done:
         if screen.play_commands(speed): 
@@ -70,13 +99,10 @@ def get_path(log, filename):
                 done = True
         else:
             done = True
-
     return path
-
 
 def find_paths(log):
     """ Do not change this function """
-
     files = (
         'very-small.bmp',
         'very-small-loops.bmp',
@@ -89,7 +115,6 @@ def find_paths(log):
         'large-squares.bmp',
         'large-open.bmp'
     )
-
     log.write('*' * 40)
     log.write('Part 1')
     for filename in files:
@@ -100,13 +125,11 @@ def find_paths(log):
         log.write(f'Found path has length     = {len(path)}')
     log.write('*' * 40)
 
-
 def main():
     """ Do not change this function """
     sys.setrecursionlimit(5000)
     log = Log(show_terminal=True)
     find_paths(log)
-
 
 if __name__ == "__main__":
     main()
