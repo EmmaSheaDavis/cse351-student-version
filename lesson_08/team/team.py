@@ -68,11 +68,70 @@ Suggestions and team Discussion:
 
 import time
 import threading
+import random
 
 PHILOSOPHERS = 5
 MAX_MEALS_EATEN = PHILOSOPHERS * 5 # NOTE: Total meals to be eaten, not per philosopher!
 
+meals = 0
+meals_count = [0] * PHILOSOPHERS
+
 # TODO - Create the Waiter class.
+class Waiter:
+    def __init__(self, num_philosophers):  
+      self.lock = threading.Lock()
+      self.forks = [threading.Lock() for _ in range(num_philosophers)]
+      self.meals_eaten = 0
+      self.meals_per_philosophers = [0] * num_philosophers
+      self.stop = False
+    
+    def can_eat(self, philosopher_id):
+        with self.lock:
+            if self.stop:
+                return False
+            
+            left_fork = philosopher_id
+            right_fork = (philosopher_id + 1) % PHILOSOPHERS
+
+            if (not self.forks[left_fork].locked()) and (not self.forks[right_fork].locked()) and self.meals_eaten < MAX_MEALS_EATEN:
+                self.forks[left_fork].acquire()
+                self.forks[right_fork].acquire()
+                return True
+            return False
+        
+    def done_eating(self, philosopher_id):
+        with self.lock:
+            left_fork = philosopher_id
+            right_fork = (philosopher_id + 1) % PHILOSOPHERS
+            self.forks[left_fork].release()
+            self.forks[right_fork].release()
+            self.meals_eaten += 1
+            self.meals_per_philosophers[philosopher_id] += 1
+            print()
+            print(f"{self.meals_eaten} meals eaten")
+            if self.meals_eaten == MAX_MEALS_EATEN:
+                self.stop = True
+    
+def philosopher(philosopher_id, waiter):
+    while True:
+        think_time = random.uniform(1, 3)
+        print(f"Philosopher {philosopher_id} thinking for {think_time:.2f} seconds.")
+        time.sleep(think_time)
+
+        while True:
+            if waiter.can_eat(philosopher_id):
+                eat_time = random.uniform(1, 3)
+                print(f"Philosohper {philosopher_id} is eating for {eat_time:.2f} seconds.")
+                time.sleep(eat_time)
+                waiter.done_eating(philosopher_id)
+                break
+            else:
+                if waiter.stop:
+                    return
+                wait_time = random.uniform(1, 3)
+                print(f"Philosopher {philosopher_id} is waiting for {wait_time:.2f} seconds.")
+                time.sleep(wait_time)
+    
 
 def main():
     # TODO - Get an instance of the Waiter.
@@ -80,7 +139,27 @@ def main():
     # TODO - Create PHILOSOPHERS philosophers.
     # TODO - Start them eating and thinking.
     # TODO - Display how many times each philosopher ate.
-    pass
+    waiter = Waiter(PHILOSOPHERS)
+
+    threads = []
+
+    for i in range(PHILOSOPHERS):
+        t = threading.Thread(target=philosopher, args=(i, waiter))
+        t.daemon = True
+        threads.append(t)
+
+    for t in threads:
+        t.start()
+
+    while waiter.meals_eaten < MAX_MEALS_EATEN:
+        time.sleep(0.1)
+
+    time.sleep(1)
+
+    print("Meals eaten per philosopher:")
+    print()
+    for i in range(PHILOSOPHERS):
+        print(f"Philosopher {i}: {waiter.meals_per_philosophers[i]} meals.")
 
 
 if __name__ == '__main__':
