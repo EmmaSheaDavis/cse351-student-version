@@ -32,48 +32,45 @@ def solve_path(maze):
     """ Solve the maze and return the path found between the start and end positions.  
         The path is a list of positions, (x, y) """
     path = []
-    visited = set()  # Track visited positions to avoid cycles
+    visited = set() 
     
     def explore(x, y):
         """ Recursively explore the maze from position (x, y). Returns True if a path is found. """
-        # If position is already visited or not open, stop this path
         if (x, y) in visited or not maze.can_move_here(x, y):
             return False
         
-        # Base case: if current position is the end, we found the path
         if maze.at_end(x, y):
-            path.append((x, y))  # Add end position to path
+            path.append((x, y)) 
             return True
         
-        # Mark current position as visited and draw it (grey for visited)
         visited.add((x, y))
-        maze.restore(x, y)  # Use restore to mark visited cells in grey
+        maze.restore(x, y)  
         
-        # Get possible moves (neighbors: up, down, left, right)
         neighbors = maze.get_possible_moves(x, y)
         
         # Explore each neighbor
         for next_x, next_y in neighbors:
-            if explore(next_x, next_y):  # If a path is found through this neighbor
-                path.append((x, y))  # Add current position to path
+            if explore(next_x, next_y): 
+                path.append((x, y)) 
                 return True
         
-        return False
+        return False 
+    
+   
     start_x, start_y = maze.get_start_pos()
-    # Check if start position is valid
+   
     if not maze.can_move_here(start_x, start_y):
         return path
     
     # Explore from the start
     if explore(start_x, start_y):
-        # If a path is found, add start to path and draw the entire path in blue
         path.append((start_x, start_y))
-        path.reverse()  # Reverse to get start-to-end order
-        # Draw the entire path in blue
+        path.reverse()  
         for x, y in path:
-            maze.move(x, y, COLOR)  # Draw each position in blue
+            if maze.can_move_here(x, y): 
+                maze.move(x, y, COLOR)  
     else:
-        path = []  # Clear path if no solution exists
+        path = []  
     
     return path
 
