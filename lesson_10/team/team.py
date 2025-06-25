@@ -17,6 +17,7 @@ import time
 import random
 import threading
 import multiprocessing as mp
+import queue as Queue
 
 from cse351 import *
 
@@ -85,19 +86,120 @@ def merge_normal(arr):
     merge_sort(arr)
 
 
-def merge_sort_thread(arr):
-    # TODO - Add your code here to use threads.
-    #        call, you need to create a thread to handle that call
-    pass
+def merge_sort_thread_recursive(arr, start=None, end=None, depth=0, max_depth=4):
+    # Initialize start and end for first call
+    if start is None:
+        start = 0
+    if end is None:
+        end = len(arr)
 
+    # Base case
+    if end - start <= 1:
+        return
+    
+    mid = (start + end) // 2
+
+    if depth < max_depth:
+        # Create threads for recursive calls
+        left_thread = threading.Thread(target=merge_sort_thread_recursive, 
+                                      args=(arr, start, mid, depth + 1, max_depth))
+        right_thread = threading.Thread(target=merge_sort_thread_recursive, 
+                                       args=(arr, mid, end, depth + 1, max_depth))
+
+        left_thread.start()
+        right_thread.start()
+        left_thread.join()
+        right_thread.join()
+    else:
+        # Use sequential merge sort for deeper recursion
+        merge_sort_thread_recursive(arr, start, mid, depth + 1, max_depth)
+        merge_sort_thread_recursive(arr, mid, end, depth + 1, max_depth)
+
+    # Merge the sorted halves
+    L = arr[start:mid]
+    R = arr[mid:end]
+    
+    i = j = k = 0
+    while i < len(L) and j < len(R):
+        if L[i] <= R[j]:
+            arr[start + k] = L[i]
+            i += 1
+        else:
+            arr[start + k] = R[j]
+            j += 1
+        k += 1
+
+    while i < len(L):
+        arr[start + k] = L[i]
+        i += 1
+        k += 1
+
+    while j < len(R):
+        arr[start + k] = R[j]
+        j += 1
+        k += 1
+
+def merge_sort_process_recursive(arr, start=None, end=None, depth=0, max_depth=2):
+    # Initialize start and end for first call
+    if start is None:
+        start = 0
+    if end is None:
+        end = len(arr)
+
+    # Base case
+    if end - start <= 1:
+        return
+    
+    mid = (start + end) // 2
+
+    if depth < max_depth:
+        # Use multiprocessing with shared array
+        left_process = mp.Process(target=merge_sort_process_recursive, 
+                                 args=(arr, start, mid, depth + 1, max_depth))
+        right_process = mp.Process(target=merge_sort_process_recursive, 
+                                  args=(arr, mid, end, depth + 1, max_depth))
+
+        left_process.start()
+        right_process.start()
+        left_process.join()
+        right_process.join()
+    else:
+        # Use sequential merge sort for deeper recursion
+        merge_sort_process_recursive(arr, start, mid, depth + 1, max_depth)
+        merge_sort_process_recursive(arr, mid, end, depth + 1, max_depth)
+
+    # Merge the sorted halves
+    L = arr[start:mid]
+    R = arr[mid:end]
+    
+    i = j = k = 0
+    while i < len(L) and j < len(R):
+        if L[i] <= R[j]:
+            arr[start + k] = L[i]
+            i += 1
+        else:
+            arr[start + k] = R[j]
+            j += 1
+        k += 1
+
+    while i < len(L):
+        arr[start + k] = L[i]
+        i += 1
+        k += 1
+
+    while j < len(R):
+        arr[start + k] = R[j]
+        j += 1
+        k += 1
+
+def merge_sort_thread(arr):
+    merge_sort_thread_recursive(arr, 0, len(arr))
 
 def merge_sort_process(arr):
-    # TODO - Add your code here to use process.
-    #        call, you need to create a process to handle that call
-    pass
-
-
-# TODO - Add any function(s) here if needed.
+    with mp.Manager() as manager:
+        shared_arr = manager.list(arr)
+        merge_sort_process_recursive(shared_arr, 0, len(shared_arr))
+        arr[:] = shared_arr[:]
 
 
 def main():
