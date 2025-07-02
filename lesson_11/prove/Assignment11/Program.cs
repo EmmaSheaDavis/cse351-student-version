@@ -1,4 +1,8 @@
-﻿namespace ConsoleApp1;
+﻿// This assignment meets with category 4: Meet Requirements
+// I gave it this categroy because the program has workers and threads added and the program runs faster than the base program 
+//origonally given.
+
+namespace ConsoleApp1;
 
 using System;
 using System.Collections.Concurrent;
